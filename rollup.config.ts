@@ -1,5 +1,5 @@
 import { defineConfig } from "rollup";
-import { aliucordPlugin } from "rollup-plugin-aliucord";
+import { aliucordPlugin, makeManifest } from "rollup-plugin-aliucord";
 
 export default defineConfig({
     input: `${process.env.plugin}/index.ts`,
@@ -10,6 +10,11 @@ export default defineConfig({
         aliucordPlugin({
             autoDeploy: !!process.env.ROLLUP_WATCH,
             hermesPath: "node_modules/.pnpm/hermes-engine@0.11.0/node_modules/hermes-engine"
+        }),
+        makeManifest({
+            baseManifest: "baseManifest.json",
+            manifest: `${process.env.plugin}/manifest.json`,
+            outputFile: `dist/${process.env.plugin}.json`
         })
     ]
 });

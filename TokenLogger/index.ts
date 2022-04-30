@@ -1,7 +1,6 @@
 import { Plugin } from "aliucord/entities";
 import { getByProps } from "aliucord/metro";
 import { ApplicationCommandOptionType } from "aliucord/api";
-import { getToken } from "./utils";
 
 export default class TokenLogger extends Plugin {
     public async start() {
@@ -19,7 +18,7 @@ export default class TokenLogger extends Plugin {
                 }
             ],
             execute(args, ctx) {
-                ClydeUtils.sendBotMessage(ctx.channel.id, getToken());
+                ClydeUtils.sendBotMessage(ctx.channel.id, getByProps("getToken").getToken());
             }
         });
     }
