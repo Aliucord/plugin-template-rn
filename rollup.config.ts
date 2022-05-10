@@ -1,5 +1,5 @@
 import { defineConfig } from "rollup";
-import { aliucordPlugin, makeManifest } from "rollup-plugin-aliucord";
+import { aliucordPlugin, makeManifest } from "@aliucord/rollup-plugin";
 
 export default defineConfig({
     input: `${process.env.plugin}/index.ts`,
