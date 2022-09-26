@@ -1,5 +1,5 @@
 import { defineConfig } from "rollup";
-import { aliucordPlugin, makeManifest } from "@aliucord/rollup-plugin";
+import { aliucordPlugin, makeManifest, makePluginZip } from "@aliucord/rollup-plugin";
 
 export default defineConfig({
     input: `${process.env.plugin}/index.ts`,
@@ -15,6 +15,9 @@ export default defineConfig({
             baseManifest: "baseManifest.json",
             manifest: `${process.env.plugin}/manifest.json`,
             outputFile: `dist/${process.env.plugin}.json`
+        }),
+        makePluginZip({
+            zipPath: `dist/${process.env.plugin}.zip`
         })
     ]
 });
