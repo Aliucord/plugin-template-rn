@@ -13,11 +13,8 @@ export default defineConfig({
         }),
         makeManifest({
             baseManifest: "baseManifest.json",
-            manifest: `${process.env.plugin}/manifest.json`,
-            outputFile: `dist/${process.env.plugin}.json`
-        }),
-        makePluginZip({
-            zipPath: `dist/${process.env.plugin}.zip`
-        })
+            manifest: `${process.env.plugin}/manifest.json`
+	}),
+        makePluginZip()
     ]
 });
