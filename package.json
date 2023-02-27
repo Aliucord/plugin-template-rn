@@ -17,7 +17,6 @@
     "@types/react-native": "^0.67.6",
     "aliucord": "^0.1.0",
     "discord-types": "^1.3.3",
-    "hermes-engine": "0.11.0",
     "rollup": "^2.71.1",
     "tslib": "^2.4.0",
     "typescript": "^4.6.4"
