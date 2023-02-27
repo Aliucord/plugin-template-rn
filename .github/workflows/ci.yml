@@ -16,8 +16,11 @@ jobs:
             - uses: actions/setup-node@v2
               with:
                   registry-url: "https://registry.npmjs.org"
+            - name: Install pnpm
+              run: npm i -g pnpm
+
             - name: Install dependencies
-              run: npm install
+              run: pnpm install
 
             - name: Build plugins
               run: |
