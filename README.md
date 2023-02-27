@@ -1,18 +1,5 @@
-# Plugin Template for AliucordRN
+# AliucordRN plugins
+my aliucordrn plugins lol
 
-This template uses typescript and the pnpm package manager
-
-Make a copy of this template, clone it and run `pnpm install`
-
-## Building plugins
-
-Build Plugin:
-```sh
-pnpm build TokenLogger
-```
-
-Watch for changes and auto compile & deploy* :
-```sh
-pnpm watch TokenLogger
-```
-\* Requires adb installed and to be connected to your phone
+## [Moyai](https://github.com/Axelen123/useful-aliucordrn-plugins/blob/builds/Moyai.zip?raw=true)
+🗿🗿🗿🗿🗿🗿🗿🗿🗿
