@@ -1,5 +1,8 @@
 import { Plugin } from "aliucord/entities";
 import { ReactNative, FluxDispatcher, SelectedChannelStore, UserStore } from 'aliucord/metro';
+import { Settings } from "aliucord/api/Settings";
+
+import SettingsPage from './settingsPage';
 
 import { Message, ReactionEmoji } from "discord-types/general";
 import { Logger } from "aliucord/utils/Logger";
@@ -56,13 +59,18 @@ function sleep(ms) {
     return new Promise(resolve => setTimeout(resolve, ms));
 }
 
+export interface MoyaiSettings {
+  ignoreBots: boolean;
+}
+
 // Port of https://github.com/Vendicated/Vencord/blob/main/src/plugins/moyai.ts
-// TODO: settings lol
-export default class Moyai extends Plugin {
+export default class Moyai extends Plugin<MoyaiSettings> {
+    public static instance: Moyai;
+
     async onMessage(e: IMessageCreate) {
         if (e.optimistic || e.type !== "MESSAGE_CREATE") return;
         if (e.message.state === "SENDING") return;
-        // if (Settings.plugins.Moyai.ignoreBots && e.message.author?.bot) return;
+        if (this.settings.get("ignoreBots", true) && e.message.author?.bot) return;
         if (!e.message.content) return;
         if (e.channelId !== SelectedChannelStore.getChannelId()) return;
 
@@ -76,7 +84,7 @@ export default class Moyai extends Plugin {
 
     async onReaction(e: IReactionAdd) {
         if (e.optimistic || e.type !== "MESSAGE_REACTION_ADD") return;
-        // if (Settings.plugins.Moyai.ignoreBots && UserStore.getUser(e.userId)?.bot) return;
+        if (this.settings.get("ignoreBots", true) && UserStore.getUser(e.userId)?.bot) return;
         if (e.channelId !== SelectedChannelStore.getChannelId()) return;
 
         const name = e.emoji.name.toLowerCase();
@@ -104,6 +112,15 @@ export default class Moyai extends Plugin {
         FluxDispatcher.unsubscribe("MESSAGE_CREATE", this.onMessage);
         FluxDispatcher.unsubscribe("MESSAGE_REACTION_ADD", this.onReaction);
         FluxDispatcher.unsubscribe("VOICE_CHANNEL_EFFECT_SEND", this.onVoiceChannelEffect);
+    }
+
+    constructor(...args) {
+      super(...args)
+      Moyai.instance = this;
+    }
+
+    public SettingsModal() {
+        return (<SettingsPage _settings={Moyai.instance.settings} />);
     }
 }
 
