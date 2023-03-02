@@ -1,37 +1,69 @@
-import { React, ReactNative, Forms } from 'aliucord/metro';
+import { React, ReactNative, Forms } from "aliucord/metro";
 
-const { ScrollView } = ReactNative;
+const { View, Text, Slider } = ReactNative;
 import { Settings } from "aliucord/api/Settings";
-import { MoyaiSettings } from '.';
+import { MoyaiSettings } from ".";
+import getStyles from "./styles";
 
-const { FormSection, FormInput, FormSwitch } = Forms;
+const { FormSection, FormRow, FormLabel, FormSwitch } = Forms;
 
-
-// official implementation is broken
+// same code but official useSettings explodes for some reason.
 function useSettings<T>(settings: Settings<T>) {
-    const [, update] = React.useState(0);
-    return React.useMemo(() => ({
-        get<K extends keyof T, V extends T[K]>(key: K, defaultValue: V) {
-            return settings.get(key, defaultValue);
-        },
-        set<K extends keyof T, V extends T[K]>(key: K, value: V) {
-            settings.set(key, value);
-            update(x => x + 1);
-        }
-    }), []);
+  const [, update] = React.useState(0);
+  return React.useMemo(
+    () => ({
+      get<K extends keyof T, V extends T[K]>(key: K, defaultValue: V) {
+        return settings.get(key, defaultValue);
+      },
+      set<K extends keyof T, V extends T[K]>(key: K, value: V) {
+        settings.set(key, value);
+        update((x) => x + 1);
+      },
+    }),
+    []
+  );
 }
 
-export default function page({_settings}: {_settings: Settings<MoyaiSettings>}) {
-    const settings = useSettings(_settings);
-    return (
+export default function page({
+  _settings,
+  onChange,
+}: {
+  _settings: Settings<MoyaiSettings>;
+  onChange: () => any;
+}) {
+  const styles = getStyles();
+
+  const settings = useSettings(_settings);
+  return (
+    <View style={styles.container}>
       <FormSection title="Moyai">
-        <FormSwitch
-          title="Ignore bots"
-          value={settings.get("ignoreBots", true)}
-          onValueChange={(v) => {
-                 console.log("ignoreBots", v);
-                 settings.set("ignoreBots", v)
-          }} />
+        <FormRow
+          label={<Text style={styles.text}>Ignore bots</Text>}
+          trailing={
+            <FormSwitch
+              value={settings.get("ignoreBots", true)}
+              onValueChange={(v) => {
+                settings.set("ignoreBots", v);
+                onChange();
+              }}
+            />
+          }
+        />
+        <FormRow
+          label={<Text style={styles.text}>Volume</Text>}
+          trailing={
+            <Slider
+              style={styles.slider}
+              value={settings.get("volume", 0.5)}
+              onValueChange={(v) => {
+                console.log("asdf", v);
+                settings.set("volume", v);
+                onChange();
+              }}
+            />
+          }
+        />
       </FormSection>
-  )
+    </View>
+  );
 }
