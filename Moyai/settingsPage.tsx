@@ -34,6 +34,8 @@ export default function page({
   const styles = getStyles();
 
   const settings = useSettings(_settings);
+  const vol = settings.get("volume", 0.5);
+
   return (
     <View style={styles.container}>
       <FormSection title="Moyai">
@@ -52,15 +54,17 @@ export default function page({
         <FormRow
           label={<Text style={styles.text}>Volume</Text>}
           trailing={
-            <Slider
-              style={styles.slider}
-              value={settings.get("volume", 0.5)}
-              onValueChange={(v) => {
-                console.log("asdf", v);
-                settings.set("volume", v);
-                onChange();
-              }}
-            />
+            <>
+              <Text style={styles.text}>{vol * 100}%</Text>
+              <Slider
+                style={styles.slider}
+                value={vol}
+                onSlidingComplete={(v) => {
+                  settings.set("volume", v);
+                  onChange();
+                }}
+              />
+            </>
           }
         />
       </FormSection>

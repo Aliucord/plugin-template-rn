@@ -23,7 +23,7 @@ export default function getStyles() {
       paddingLeft: 0,
     },
     slider: {
-      width: "100%",
+      width: 250,
     },
 
     marginBox: {

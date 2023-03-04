@@ -43,27 +43,7 @@ interface IVoiceChannelEffectSendEvent {
   animationId: number;
 }
 
-let soundManager = null;
-// no one steal this k thx
 let sound_id = 4000;
-
-async function boom(vol: number) {
-  console.log("🗿 vine boom! 🗿");
-  console.log(vol);
-  try {
-    sound_id++;
-    // This probably isnt the proper way to use the soundmanager, but who cares :trolley:
-    await new Promise((resolve) =>
-      // "notification", "ring_tone", "voice"
-      soundManager.prepare(MOYAI_URL, "notification", sound_id, resolve)
-    );
-    soundManager.setVolume(sound_id, vol * 10);
-    soundManager.play(sound_id);
-    // soundManager.release(MOYAI_SOUND_ID);
-  } catch (e) {
-    console.error("could not play sound:", e);
-  }
-}
 
 function sleep(ms) {
   return new Promise((resolve) => setTimeout(resolve, ms));
@@ -74,17 +54,36 @@ export interface MoyaiSettings {
   volume: number;
 }
 
+// no one steal this k thx
+let soundId = 4000;
+
 // Port of https://github.com/Vendicated/Vencord/blob/main/src/plugins/moyai.ts
 export default class Moyai extends Plugin<MoyaiSettings> {
   private realSettings: MoyaiSettings = {};
+  private soundManager = ReactNative.NativeModules.DCDSoundManager
 
   private updateSettings() {
     this.realSettings.ignoreBots = this.settings.get("ignoreBots", true);
     this.realSettings.volume = this.settings.get("volume", 0.5);
   }
 
-  // i hate "this".
+  async boom() {
+    console.log("🗿 vine boom! 🗿");
+    try {
+      soundId++;
+      await new Promise((resolve) =>
+        // "notification", "ring_tone", "voice"
+        this.soundManager.prepare(MOYAI_URL, "notification", soundId, resolve)
+      );
+      this.soundManager.setVolume(soundId, this.realSettings.volume);
+      this.soundManager.play(soundId);
+      // soundManager.release(MOYAI_SOUND_ID);
+    } catch (e) {
+      console.error("could not play sound:", e);
+    }
+  }
 
+  // i hate "this".
   onMessage = async (e: IMessageCreate) => {
     if (e.optimistic || e.type !== "MESSAGE_CREATE") return;
     if (e.message.state === "SENDING") return;
@@ -95,22 +94,23 @@ export default class Moyai extends Plugin<MoyaiSettings> {
     const moyaiCount = getMoyaiCount(e.message.content);
 
     for (let i = 0; i < moyaiCount; i++) {
-      await boom();
+      await this.boom();
       await sleep(300);
     }
-  }
+  };
 
-  onReaction = async (e: IReactionAdd) =>{
+  onReaction = async (e: IReactionAdd) => {
     if (e.optimistic || e.type !== "MESSAGE_REACTION_ADD") return;
-    if (this.realSettings.ignoreBots && UserStore.getUser(e.userId)?.bot) return;
+    if (this.realSettings.ignoreBots && UserStore.getUser(e.userId)?.bot)
+      return;
     if (e.channelId !== SelectedChannelStore.getChannelId()) return;
 
     const name = e.emoji.name.toLowerCase();
     if (name !== MOYAI && !name.includes("moyai") && !name.includes("moai"))
       return;
 
-    await boom();
-  }
+    await this.boom();
+  };
 
   onVoiceChannelEffect = async (e: IVoiceChannelEffectSendEvent) => {
     if (!e.emoji?.name) return;
@@ -118,12 +118,11 @@ export default class Moyai extends Plugin<MoyaiSettings> {
     if (name !== MOYAI && !name.includes("moyai") && !name.includes("moai"))
       return;
 
-    await boom();
-  }
+    await this.boom();
+  };
 
   public async start() {
     this.updateSettings();
-    soundManager = ReactNative.NativeModules.DCDSoundManager;
     FluxDispatcher.subscribe("MESSAGE_CREATE", this.onMessage);
     FluxDispatcher.subscribe("MESSAGE_REACTION_ADD", this.onReaction);
     FluxDispatcher.subscribe(
